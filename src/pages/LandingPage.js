@@ -1,49 +1,51 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-
-  const navigateToDashboard = () => {
-    navigate('/dashboard');
-  };
-
   return (
-    <div style={styles.landingPage}>
-      <h1 style={styles.heading}>Welcome to Our Space E-commerce Store!</h1>
-      <p style={styles.text}>Explore a wide variety of futuristic products and more.</p>
-      <button style={styles.button} onClick={navigateToDashboard}>Enter Store</button>
+    <div style={styles.container}>
+      <h1 style={styles.title}>Welcome to Space-Tech Store</h1>
+      <p style={styles.subtitle}>Your one-stop shop for the latest tech gadgets!</p>
+      <Link to="/dashboard" style={styles.button}>
+        Explore Products
+      </Link>
     </div>
   );
 };
 
 const styles = {
-  landingPage: {
+  container: {
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    backgroundColor: '#000',
-    color: 'Dark',
+    background: 'linear-gradient(135deg, #2b2d42, #8d99ae)',
+    color: '#edf2f4',
     textAlign: 'center',
   },
-  heading: {
-    fontSize: '2.5rem',
+  title: {
+    fontSize: '3rem',
+    fontWeight: 'bold',
     marginBottom: '20px',
   },
-  text: {
-    fontSize: '1.2rem',
+  subtitle: {
+    fontSize: '1.5rem',
     marginBottom: '30px',
   },
   button: {
+    backgroundColor: '#ef233c',
+    color: '#fff',
     padding: '15px 30px',
-    backgroundColor: '#00b3ff',
-    border: 'none',
-    color: 'primary',
+    borderRadius: '30px',
+    textDecoration: 'none',
     fontSize: '1rem',
-    borderRadius: '5px',
+    fontWeight: 'bold',
+    transition: 'transform 0.2s',
     cursor: 'pointer',
-    transition: 'all 0.3s ease',
+  },
+  buttonHover: {
+    transform: 'scale(1.05)',
   },
 };
 

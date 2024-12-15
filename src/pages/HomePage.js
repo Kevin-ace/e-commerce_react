@@ -1,44 +1,98 @@
-import React, { useState } from "react";
-import ProductList from "../components/ProductList";  // Import the product listing component
-import Cart from "../components/Cart";  // Import the cart component
-import SearchFilter from "../components/SearchFilter";  // Import search and filter functionality
+import React, { useContext } from 'react';
+import { CartContext } from '../contexts/CartContext';
 
 const HomePage = () => {
-  const [products] = useState([
-    { id: 1, name: "Galaxy Watch", price: 299, category: "Electronics" },
-    { id: 2, name: "Starship Hoodie", price: 50, category: "Fashion" },
-    { id: 3, name: "Moon Lamp", price: 25, category: "Home Decor" },
-  ]);
-  const [cart, setCart] = useState([]);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const { addToCart } = useContext(CartContext);
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-    localStorage.setItem("cart", JSON.stringify([...cart, product]));
-  };
-
-  const filteredProducts = products.filter((product) => {
-    return (
-      product.name.toLowerCase().includes(search.toLowerCase()) &&
-      (category ? product.category === category : true)
-    );
-  });
+  const products = [
+    { id: 1, name: 'Wireless Mouse', price: '$25', image: 'https://via.placeholder.com/150' },
+    { id: 2, name: 'Mechanical Keyboard', price: '$80', image: 'https://via.placeholder.com/150' },
+    { id: 3, name: 'Gaming Headset', price: '$60', image: 'https://via.placeholder.com/150' },
+    { id: 4, name: '4K Monitor', price: '$300', image: 'https://via.placeholder.com/150' },
+    { id: 5, name: 'VR Headset', price: '$500', image: 'https://via.placeholder.com/150' },
+    { id: 6, name: 'External SSD (1TB)', price: '$120', image: 'https://via.placeholder.com/150' },
+    { id: 7, name: 'Smartphone Stand', price: '$15', image: 'https://via.placeholder.com/150' },
+    { id: 8, name: 'USB-C Hub', price: '$45', image: 'https://via.placeholder.com/150' },
+  ];
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1 style={{ textAlign: "center", color: "#fff" }}>Welcome to the Dashboard</h1>
-      
-      {/* Search and Filter */}
-      <SearchFilter setSearch={setSearch} setCategory={setCategory} />
-      
-      {/* Product List */}
-      <ProductList products={filteredProducts} addToCart={addToCart} />
-      
-      {/* Cart Component */}
-      <Cart cart={cart} />
+    <div style={styles.container}>
+      <h1 style={styles.title}>Our Products</h1>
+      <div style={styles.grid}>
+        {products.map((product) => (
+          <div key={product.id} style={styles.card}>
+            <img src={product.image} alt={product.name} style={styles.image} />
+            <h3 style={styles.productName}>{product.name}</h3>
+            <p style={styles.productPrice}>{product.price}</p>
+            <button onClick={() => addToCart(product)} style={styles.button}>
+              Add to Cart
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    padding: '20px',
+    backgroundColor: '#f5f5f5',
+    minHeight: '100vh',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+    color: '#2b2d42',
+    marginBottom: '30px',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '20px',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    borderRadius: '10px',
+    padding: '15px',
+    textAlign: 'center',
+    transition: 'transform 0.2s',
+  },
+  cardHover: {
+    transform: 'scale(1.05)',
+  },
+  image: {
+    width: '100%',
+    borderRadius: '10px',
+    marginBottom: '10px',
+  },
+  productName: {
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    color: '#2b2d42',
+    marginBottom: '10px',
+  },
+  productPrice: {
+    fontSize: '1rem',
+    color: '#8d99ae',
+    marginBottom: '15px',
+  },
+  button: {
+    backgroundColor: '#ef233c',
+    color: '#fff',
+    padding: '10px 15px',
+    borderRadius: '5px',
+    border: 'none',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s',
+  },
+  buttonHover: {
+    backgroundColor: '#d90429',
+  },
 };
 
 export default HomePage;
