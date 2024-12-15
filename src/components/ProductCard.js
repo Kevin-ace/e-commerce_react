@@ -3,11 +3,18 @@ import { motion } from "framer-motion";
 import { useWishlist } from "../contexts/WishlistContext";
 import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
+import { useTheme } from '../contexts/ThemeContext';
 
-const ProductCard = ({ product, addToCart }) => {
+const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { cart, addToCart } = useCart();
+  const { theme } = useTheme();
+  
   const isInWishlist = wishlist.some(item => item.id === product.id);
+  const cartItem = cart.find(item => item.id === product.id);
+  const quantity = cartItem ? cartItem.quantity : 0;
 
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
@@ -29,14 +36,16 @@ const ProductCard = ({ product, addToCart }) => {
       whileTap={{ scale: 0.95 }}
       style={{
         position: 'relative',
-        border: "1px solid #fff",
+        border: `1px solid ${theme.borderColor}`,
         margin: "10px",
         padding: "10px",
         textAlign: "center",
-        background: "rgba(0, 0, 0, 0.7)",
+        backgroundColor: theme.cardBackground,
         borderRadius: "10px",
-        boxShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
-        cursor: 'pointer'
+        boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)",
+        cursor: 'pointer',
+        color: theme.text,
+        transition: 'background-color 0.3s ease, color 0.3s ease'
       }}
       onClick={handleProductClick}
     >
@@ -51,9 +60,20 @@ const ProductCard = ({ product, addToCart }) => {
           marginBottom: '10px'
         }} 
       />
-      <h3 style={{ color: "#fff" }}>{product.name}</h3>
-      <p style={{ color: "#fff" }}>Price: ${product.price}</p>
-      <p style={{ color: "#fff" }}>Category: {product.category}</p>
+      <h3>{product.name}</h3>
+      <p>Price: ${product.price}</p>
+      <p>Category: {product.category}</p>
+      
+      {quantity > 0 && (
+        <p style={{ 
+          color: theme.primary, 
+          fontWeight: 'bold',
+          marginBottom: '10px'
+        }}>
+          In Cart: {quantity} (Total: ${(product.price * quantity).toFixed(2)})
+        </p>
+      )}
+      
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -71,7 +91,7 @@ const ProductCard = ({ product, addToCart }) => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: "10px 20px",
-            backgroundColor: "#00b3ff",
+            backgroundColor: theme.primary,
             border: "none",
             color: "#fff",
             borderRadius: "5px",
@@ -81,8 +101,8 @@ const ProductCard = ({ product, addToCart }) => {
             gap: '10px'
           }}
           whileHover={{
-            backgroundColor: "#005f6b",
-            boxShadow: "0 0 15px rgba(0, 0, 255, 0.5)",
+            backgroundColor: theme.secondary,
+            boxShadow: `0 0 15px ${theme.primary}`,
           }}
         >
           <FaShoppingCart /> Add to Cart
@@ -97,8 +117,8 @@ const ProductCard = ({ product, addToCart }) => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: "10px 15px",
-            backgroundColor: isInWishlist ? "#ff4136" : "transparent",
-            border: "1px solid #ff4136",
+            backgroundColor: isInWishlist ? theme.primary : "transparent",
+            border: `1px solid ${theme.primary}`,
             color: "#fff",
             borderRadius: "5px",
             cursor: "pointer",
@@ -106,7 +126,7 @@ const ProductCard = ({ product, addToCart }) => {
             transition: "all 0.3s ease",
           }}
           whileHover={{
-            backgroundColor: "#ff4136",
+            backgroundColor: theme.primary,
             scale: 1.05
           }}
         >

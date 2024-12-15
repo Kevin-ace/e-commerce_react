@@ -1,57 +1,61 @@
-# 🚀 Space-Tech Store
+# Space-Tech Store 🚀
 
 ## Overview
-Space-Tech Store is a modern, feature-rich e-commerce application built with React, focusing on providing an exceptional user experience for tech enthusiasts.
+Space-Tech Store is a modern, responsive e-commerce application built with React, focusing on providing an immersive shopping experience for tech enthusiasts.
 
 ## 🌟 Features
 
-### 1. Product Browsing
-- Comprehensive product catalog
-- Advanced search and filtering
-- Responsive product cards
+### Core Functionality
+- User Authentication
+- Product Browsing
+- Cart Management
+- Wishlist Management
+- Product Recommendations
+- Theme Toggling
 
-### 2. Wishlist Management
-- Add/remove products from wishlist
-- Dedicated wishlist page
-- Seamless integration with product browsing
+### Advanced Features
+- Responsive Design
+- Animated Interactions
+- Personalized Recommendations
+- Dynamic Theming
+- Search and Filter Capabilities
 
-### 3. Authentication
-- Secure user authentication
-- Protected routes
-- User profile management
+## 🛠 Technology Stack
+- **Frontend**: React.js
+- **State Management**: React Context API
+- **Routing**: React Router
+- **Animations**: Framer Motion
+- **Icons**: React Icons
+- **Styling**: Dynamic Theme System
 
-### 4. Shopping Cart
-- Add products to cart
-- Manage cart items
-- Smooth checkout process
+## 🎨 Theme System
+The application features a comprehensive theme system with:
+- Dark and Light modes
+- Customizable color palette
+- Smooth transitions
+- Context-based theme management
 
-## 🛠 Tech Stack
-- React
-- React Router
-- Context API
-- Framer Motion
-- React Icons
+### Theme Properties
+- `background`: Main page background
+- `text`: Primary text color
+- `primary`: Accent color for buttons and highlights
+- `secondary`: Secondary background color
+- `accent`: Complementary accent color
 
-## 🚦 Routes
-- `/` - Landing Page
-- `/login` - Authentication
-- `/dashboard` - Product Listing
-- `/product/:id` - Product Details
-- `/wishlist` - User Wishlist
-- `/cart` - Shopping Cart
+## 🔍 Recommendation System
+Intelligent product recommendation engine that:
+- Generates suggestions based on user interactions
+- Considers cart and wishlist history
+- Provides fallback to random products
+- Dynamically updates recommendations
 
-## 🔐 Authentication
-**Test Credentials:**
-- Email: `user@example.com`
-- Password: `password`
-
-## 📦 Installation
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js (v14+)
 - npm or yarn
 
-### Setup
+### Installation
 1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/space-tech-store.git
@@ -61,19 +65,47 @@ cd space-tech-store
 2. Install dependencies
 ```bash
 npm install
+# or
+yarn install
 ```
 
 3. Start the development server
 ```bash
 npm start
+# or
+yarn start
 ```
 
-## 🌈 Upcoming Features
-- [ ] Payment integration
-- [ ] User reviews
-- [ ] Advanced product recommendations
-- [ ] Dark/Light mode toggle
+## 📂 Project Structure
+```
+src/
+├── components/
+│   ├── Navbar.js
+│   ├── ProductCard.js
+│   ├── RecommendationComponent.js
+│   └── ...
+├── contexts/
+│   ├── AuthContext.js
+│   ├── CartContext.js
+│   ├── ThemeContext.js
+│   ├── RecommendationContext.js
+│   └── ...
+├── pages/
+│   ├── HomePage.js
+│   ├── ProductDetailsPage.js
+│   ├── CartPage.js
+│   └── ...
+└── data.js
+```
 
----
+## 🌈 Theming
+The application uses a context-based theme system allowing:
+- Easy theme switching
+- Consistent color application
+- Custom theme configuration
 
-**Happy Shopping! 🛒✨**
+## 🔮 Future Roadmap
+- [ ] User Preferences Persistence
+- [ ] Advanced Recommendation Algorithms
+- [ ] Social Sharing Features
+- [ ] Performance Optimizations

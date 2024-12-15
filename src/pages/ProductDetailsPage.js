@@ -1,21 +1,110 @@
-import React, { useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { CartContext } from '../contexts/CartContext';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useParams } from 'react-router-dom';
+import { FaHeart, FaShoppingCart } from 'react-icons/fa';
+import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { products } from '../data';
-import { FaShoppingCart, FaHeart, FaRegHeart, FaArrowLeft } from 'react-icons/fa';
+import ReviewComponent from '../components/ReviewComponent';
+import RecommendationComponent from '../components/RecommendationComponent';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCart();
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  
-  // Find the product by ID
+  const { theme } = useTheme();
+
   const product = products.find(p => p.id === parseInt(id));
-  
-  // Check if product is in wishlist
   const isInWishlist = wishlist.some(item => item.id === product.id);
+  const [quantity, setQuantity] = useState(1);
+
+  const styles = {
+    container: {
+      display: 'flex',
+      padding: '40px',
+      backgroundColor: theme.background,
+      color: theme.text,
+      minHeight: '100vh',
+      transition: 'background-color 0.3s ease, color 0.3s ease'
+    },
+    imageContainer: {
+      flex: 1,
+      marginRight: '40px',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    image: {
+      maxWidth: '100%',
+      maxHeight: '500px',
+      objectFit: 'contain',
+      borderRadius: '10px',
+      boxShadow: `0 10px 20px ${theme.primary}20`
+    },
+    detailsContainer: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+    },
+    title: {
+      fontSize: '2.5rem',
+      marginBottom: '20px',
+      color: theme.primary,
+    },
+    price: {
+      fontSize: '1.8rem',
+      color: theme.primary,
+      marginBottom: '20px',
+    },
+    description: {
+      marginBottom: '30px',
+      lineHeight: 1.6,
+    },
+    quantityContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '20px',
+    },
+    quantityButton: {
+      backgroundColor: theme.secondary,
+      color: theme.text,
+      border: 'none',
+      borderRadius: '5px',
+      padding: '10px 15px',
+      margin: '0 10px',
+      cursor: 'pointer',
+    },
+    actionButtons: {
+      display: 'flex',
+      gap: '20px',
+    },
+    cartButton: {
+      backgroundColor: theme.primary,
+      color: '#fff',
+      border: 'none',
+      borderRadius: '5px',
+      padding: '15px 25px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '10px',
+      cursor: 'pointer',
+    },
+    wishlistButton: {
+      backgroundColor: isInWishlist ? theme.primary : 'transparent',
+      color: '#fff',
+      border: `2px solid ${theme.primary}`,
+      borderRadius: '5px',
+      padding: '15px 25px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '10px',
+      cursor: 'pointer',
+    }
+  };
 
   const handleWishlistToggle = () => {
     if (isInWishlist) {
@@ -25,130 +114,74 @@ const ProductDetailsPage = () => {
     }
   };
 
-  const styles = {
-    container: {
-      display: 'flex',
-      padding: '40px',
-      backgroundColor: '#1a1a2e',
-      minHeight: 'calc(100vh - 80px)',
-      color: '#fff',
-    },
-    imageContainer: {
-      flex: 1,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: '40px',
-    },
-    image: {
-      maxWidth: '500px',
-      width: '100%',
-      borderRadius: '15px',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-    },
-    details: {
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-    },
-    title: {
-      fontSize: '2.5rem',
-      marginBottom: '20px',
-      color: '#00b3ff',
-    },
-    price: {
-      fontSize: '2rem',
-      color: '#00b3ff',
-      marginBottom: '20px',
-    },
-    description: {
-      marginBottom: '30px',
-      lineHeight: '1.6',
-      color: '#e0e0e0',
-    },
-    actionButtons: {
-      display: 'flex',
-      gap: '20px',
-    },
-    button: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '15px 30px',
-      borderRadius: '10px',
-      fontSize: '1rem',
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-    },
-    cartButton: {
-      backgroundColor: '#00b3ff',
-      color: '#fff',
-      border: 'none',
-    },
-    wishlistButton: {
-      backgroundColor: isInWishlist ? '#ff4136' : 'transparent',
-      color: '#fff',
-      border: '2px solid #ff4136',
-    },
-    backButton: {
-      position: 'absolute',
-      top: '20px',
-      left: '20px',
-      backgroundColor: 'transparent',
-      color: '#fff',
-      border: 'none',
-      fontSize: '1.5rem',
-      cursor: 'pointer',
-    }
-  };
-
   if (!product) {
     return <div style={styles.container}>Product not found</div>;
   }
 
   return (
-    <div style={styles.container}>
-      <button 
-        onClick={() => navigate(-1)} 
-        style={styles.backButton}
-      >
-        <FaArrowLeft />
-      </button>
-      <div style={styles.imageContainer}>
-        <img 
-          src={product.image} 
-          alt={product.name} 
-          style={styles.image} 
-        />
-      </div>
-      <div style={styles.details}>
-        <h1 style={styles.title}>{product.name}</h1>
-        <p style={styles.price}>${product.price}</p>
-        <p style={styles.description}>
-          Detailed product description would go here. This is a placeholder 
-          description to showcase the layout and design of the product details page.
-          You can customize this with more specific information about each product.
-        </p>
-        <div style={styles.actionButtons}>
-          <button 
-            onClick={() => addToCart(product)}
-            style={{...styles.button, ...styles.cartButton}}
-          >
-            <FaShoppingCart style={{ marginRight: '10px' }} /> 
-            Add to Cart
-          </button>
-          <button 
-            onClick={handleWishlistToggle}
-            style={{...styles.button, ...styles.wishlistButton}}
-          >
-            {isInWishlist ? <FaHeart /> : <FaRegHeart />}
-            <span style={{ marginLeft: '10px' }}>
+    <div>
+      <div style={styles.container}>
+        <div style={styles.imageContainer}>
+          <motion.img
+            src={product.image}
+            alt={product.name}
+            style={styles.image}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
+        
+        <div style={styles.detailsContainer}>
+          <h1 style={styles.title}>{product.name}</h1>
+          <p style={styles.price}>${product.price}</p>
+          <p style={styles.description}>{product.description}</p>
+          
+          <div style={styles.quantityContainer}>
+            <motion.button
+              style={styles.quantityButton}
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              -
+            </motion.button>
+            <span>{quantity}</span>
+            <motion.button
+              style={styles.quantityButton}
+              onClick={() => setQuantity(quantity + 1)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              +
+            </motion.button>
+          </div>
+          
+          <div style={styles.actionButtons}>
+            <motion.button
+              style={styles.cartButton}
+              onClick={() => addToCart({ ...product, quantity })}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaShoppingCart /> Add to Cart
+            </motion.button>
+            
+            <motion.button
+              style={styles.wishlistButton}
+              onClick={handleWishlistToggle}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaHeart style={{ color: isInWishlist ? '#fff' : theme.primary }} />
               {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-            </span>
-          </button>
+            </motion.button>
+          </div>
         </div>
       </div>
+      
+      <ReviewComponent productId={product.id} />
+      <RecommendationComponent />
     </div>
   );
 };
