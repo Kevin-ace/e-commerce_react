@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import LoginPage from "./pages/LoginPage";
+import PublicProductsPage from "./pages/PublicProductsPage";
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { ReviewProvider } from './contexts/ReviewContext';
@@ -37,9 +37,9 @@ const ThemedApp = () => {
       transition: 'background-color 0.3s ease, color 0.3s ease'
     }}>
       <Router>
-        <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/explore" element={<PublicProductsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route 
             path="/dashboard" 

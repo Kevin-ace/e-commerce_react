@@ -2,6 +2,7 @@ import React from 'react';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
+import Layout from '../components/Layout';
 
 const CartPage = () => {
   const { cart, total, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -90,69 +91,71 @@ const CartPage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Your Cart</h1>
-      
-      {cart.length === 0 ? (
-        <p style={{ 
-          textAlign: 'center', 
-          color: theme.text, 
-          opacity: 0.6 
-        }}>
-          Your cart is empty
-        </p>
-      ) : (
-        <>
-          <div style={styles.cartGrid}>
-            {cart.map((item) => (
-              <div key={item.id} style={styles.cartItem}>
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  style={styles.image} 
-                />
-                <div style={styles.itemDetails}>
-                  <h3>{item.name}</h3>
-                  <p>Price: ${item.price}</p>
-                  <div style={styles.quantityControl}>
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      style={styles.quantityButton}
-                    >
-                      <FaMinus />
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      style={styles.quantityButton}
-                    >
-                      <FaPlus />
-                    </button>
+    <Layout showNavbar={true}>
+      <div style={styles.container}>
+        <h1 style={styles.title}>Your Cart</h1>
+        
+        {cart.length === 0 ? (
+          <p style={{ 
+            textAlign: 'center', 
+            color: theme.text, 
+            opacity: 0.6 
+          }}>
+            Your cart is empty
+          </p>
+        ) : (
+          <>
+            <div style={styles.cartGrid}>
+              {cart.map((item) => (
+                <div key={item.id} style={styles.cartItem}>
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    style={styles.image} 
+                  />
+                  <div style={styles.itemDetails}>
+                    <h3>{item.name}</h3>
+                    <p>Price: ${item.price}</p>
+                    <div style={styles.quantityControl}>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        style={styles.quantityButton}
+                      >
+                        <FaMinus />
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        style={styles.quantityButton}
+                      >
+                        <FaPlus />
+                      </button>
+                    </div>
                   </div>
+                  <button 
+                    onClick={() => removeFromCart(item.id)}
+                    style={styles.removeButton}
+                  >
+                    <FaTrash />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => removeFromCart(item.id)}
-                  style={styles.removeButton}
-                >
-                  <FaTrash />
-                </button>
-              </div>
-            ))}
-          </div>
-          
-          <div style={styles.total}>
-            Total: ${total.toFixed(2)}
-          </div>
-          
-          <button 
-            onClick={clearCart}
-            style={styles.clearButton}
-          >
-            Clear Cart
-          </button>
-        </>
-      )}
-    </div>
+              ))}
+            </div>
+            
+            <div style={styles.total}>
+              Total: ${total.toFixed(2)}
+            </div>
+            
+            <button 
+              onClick={clearCart}
+              style={styles.clearButton}
+            >
+              Clear Cart
+            </button>
+          </>
+        )}
+      </div>
+    </Layout>
   );
 };
 

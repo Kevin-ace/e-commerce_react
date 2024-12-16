@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import Layout from '../components/Layout';
 import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
 
 const LoginPage = () => {
@@ -12,6 +14,7 @@ const LoginPage = () => {
 
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,65 +116,67 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.form}>
-        <h2 style={styles.title}>{isLogin ? 'Login' : 'Register'}</h2>
-        
-        {error && <p style={styles.error}>{error}</p>}
-        
-        <form onSubmit={handleSubmit}>
-          {!isLogin && (
+    <Layout showNavbar={true}>
+      <div style={styles.container}>
+        <div style={styles.form}>
+          <h2 style={styles.title}>{isLogin ? 'Login' : 'Register'}</h2>
+          
+          {error && <p style={styles.error}>{error}</p>}
+          
+          <form onSubmit={handleSubmit}>
+            {!isLogin && (
+              <div style={styles.inputContainer}>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  style={styles.input}
+                />
+                <FaUser style={styles.icon} />
+              </div>
+            )}
+            
             <div style={styles.inputContainer}>
               <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 style={styles.input}
               />
-              <FaUser style={styles.icon} />
+              <FaEnvelope style={styles.icon} />
             </div>
-          )}
+            
+            <div style={styles.inputContainer}>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={styles.input}
+              />
+              <FaLock style={styles.icon} />
+            </div>
+            
+            <button type="submit" style={styles.button}>
+              {isLogin ? 'Login' : 'Register'}
+            </button>
+          </form>
           
-          <div style={styles.inputContainer}>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-            />
-            <FaEnvelope style={styles.icon} />
-          </div>
-          
-          <div style={styles.inputContainer}>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-            />
-            <FaLock style={styles.icon} />
-          </div>
-          
-          <button type="submit" style={styles.button}>
-            {isLogin ? 'Login' : 'Register'}
-          </button>
-        </form>
-        
-        <p style={styles.toggleText}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <Link 
-            to="#" 
-            onClick={() => setIsLogin(!isLogin)}
-            style={styles.link}
-          >
-            {isLogin ? 'Register' : 'Login'}
-          </Link>
-        </p>
+          <p style={styles.toggleText}>
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            <Link 
+              to="#" 
+              onClick={() => setIsLogin(!isLogin)}
+              style={styles.link}
+            >
+              {isLogin ? 'Register' : 'Login'}
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

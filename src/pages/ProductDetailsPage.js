@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { useParams } from 'react-router-dom';
 import { FaHeart, FaShoppingCart } from 'react-icons/fa';
-import { useCart } from '../contexts/CartContext';
-import { useWishlist } from '../contexts/WishlistContext';
+import { CartContext } from '../contexts/CartContext';
+import { WishlistContext } from '../contexts/WishlistContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { products } from '../data';
 import ReviewComponent from '../components/ReviewComponent';
 import RecommendationComponent from '../components/RecommendationComponent';
+import Layout from '../components/Layout';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
-  const { addToCart } = useCart();
-  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useContext(CartContext);
+  const { wishlist, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
   const { theme } = useTheme();
 
   const product = products.find(p => p.id === parseInt(id));
@@ -115,74 +116,80 @@ const ProductDetailsPage = () => {
   };
 
   if (!product) {
-    return <div style={styles.container}>Product not found</div>;
+    return (
+      <Layout showNavbar={true}>
+        <div style={styles.container}>Product not found</div>
+      </Layout>
+    );
   }
 
   return (
-    <div>
-      <div style={styles.container}>
-        <div style={styles.imageContainer}>
-          <motion.img
-            src={product.image}
-            alt={product.name}
-            style={styles.image}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          />
+    <Layout showNavbar={true}>
+      <div>
+        <div style={styles.container}>
+          <div style={styles.imageContainer}>
+            <motion.img
+              src={product.image}
+              alt={product.name}
+              style={styles.image}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          
+          <div style={styles.detailsContainer}>
+            <h1 style={styles.title}>{product.name}</h1>
+            <p style={styles.price}>${product.price}</p>
+            <p style={styles.description}>{product.description}</p>
+            
+            <div style={styles.quantityContainer}>
+              <motion.button
+                style={styles.quantityButton}
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                -
+              </motion.button>
+              <span>{quantity}</span>
+              <motion.button
+                style={styles.quantityButton}
+                onClick={() => setQuantity(quantity + 1)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                +
+              </motion.button>
+            </div>
+            
+            <div style={styles.actionButtons}>
+              <motion.button
+                style={styles.cartButton}
+                onClick={() => addToCart({ ...product, quantity })}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FaShoppingCart /> Add to Cart
+              </motion.button>
+              
+              <motion.button
+                style={styles.wishlistButton}
+                onClick={handleWishlistToggle}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FaHeart style={{ color: isInWishlist ? '#fff' : theme.primary }} />
+                {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              </motion.button>
+            </div>
+          </div>
         </div>
         
-        <div style={styles.detailsContainer}>
-          <h1 style={styles.title}>{product.name}</h1>
-          <p style={styles.price}>${product.price}</p>
-          <p style={styles.description}>{product.description}</p>
-          
-          <div style={styles.quantityContainer}>
-            <motion.button
-              style={styles.quantityButton}
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              -
-            </motion.button>
-            <span>{quantity}</span>
-            <motion.button
-              style={styles.quantityButton}
-              onClick={() => setQuantity(quantity + 1)}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              +
-            </motion.button>
-          </div>
-          
-          <div style={styles.actionButtons}>
-            <motion.button
-              style={styles.cartButton}
-              onClick={() => addToCart({ ...product, quantity })}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaShoppingCart /> Add to Cart
-            </motion.button>
-            
-            <motion.button
-              style={styles.wishlistButton}
-              onClick={handleWishlistToggle}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaHeart style={{ color: isInWishlist ? '#fff' : theme.primary }} />
-              {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-            </motion.button>
-          </div>
-        </div>
+        <ReviewComponent productId={product.id} />
+        <RecommendationComponent />
       </div>
-      
-      <ReviewComponent productId={product.id} />
-      <RecommendationComponent />
-    </div>
+    </Layout>
   );
 };
 

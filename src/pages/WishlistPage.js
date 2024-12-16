@@ -3,6 +3,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { FaTrash, FaShoppingCart } from 'react-icons/fa';
+import Layout from '../components/Layout';
 
 const WishlistPage = () => {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -83,53 +84,55 @@ const WishlistPage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Your Wishlist</h1>
-      
-      {wishlist.length === 0 ? (
-        <p style={styles.emptyWishlist}>
-          Your wishlist is empty
-        </p>
-      ) : (
-        <div style={styles.wishlistGrid}>
-          {wishlist.map((product) => (
-            <div 
-              key={product.id} 
-              style={styles.wishlistItem}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                style={styles.image} 
-              />
-              <div style={styles.itemDetails}>
-                <h3>{product.name}</h3>
-                <p>${product.price}</p>
-                
-                <div style={styles.actionButtons}>
-                  <button
-                    onClick={() => addToCart(product)}
-                    style={{...styles.button, ...styles.cartButton}}
-                  >
-                    <FaShoppingCart style={{ marginRight: '5px' }} />
-                    Add to Cart
-                  </button>
+    <Layout showNavbar={true}>
+      <div style={styles.container}>
+        <h1 style={styles.title}>Your Wishlist</h1>
+        
+        {wishlist.length === 0 ? (
+          <p style={styles.emptyWishlist}>
+            Your wishlist is empty
+          </p>
+        ) : (
+          <div style={styles.wishlistGrid}>
+            {wishlist.map((product) => (
+              <div 
+                key={product.id} 
+                style={styles.wishlistItem}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <img 
+                  src={product.image} 
+                  alt={product.name} 
+                  style={styles.image} 
+                />
+                <div style={styles.itemDetails}>
+                  <h3>{product.name}</h3>
+                  <p>${product.price}</p>
                   
-                  <button
-                    onClick={() => removeFromWishlist(product.id)}
-                    style={{...styles.button, ...styles.removeButton}}
-                  >
-                    <FaTrash />
-                  </button>
+                  <div style={styles.actionButtons}>
+                    <button
+                      onClick={() => addToCart(product)}
+                      style={{...styles.button, ...styles.cartButton}}
+                    >
+                      <FaShoppingCart style={{ marginRight: '5px' }} />
+                      Add to Cart
+                    </button>
+                    
+                    <button
+                      onClick={() => removeFromWishlist(product.id)}
+                      style={{...styles.button, ...styles.removeButton}}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Layout>
   );
 };
 
