@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { FaFilter, FaSort } from 'react-icons/fa';
+import { 
+  FaFilter, 
+  // eslint-disable-next-line no-unused-vars
+  FaSort 
+} from 'react-icons/fa';
 
 const SearchFilter = ({ 
   setSearch, 

@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaHome,
+  // eslint-disable-next-line no-unused-vars
   FaShoppingCart,
   FaHeart,
   FaUser,

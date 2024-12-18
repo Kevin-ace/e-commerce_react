@@ -1,5 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { 
+  // eslint-disable-next-line no-unused-vars
+  Link, 
+  useNavigate 
+} from 'react-router-dom';
 
 const LandingPage = () => {
   const navigate = useNavigate();

@@ -85,7 +85,7 @@ router.post('/login', [
   if (!errors.isEmpty()) {
     return res.status(400).json({ 
       errors: errors.array(),
-      message: 'Invalid input data' 
+      message: 'Invalid input data. Please check your email and password format.' 
     });
   }
 
@@ -95,20 +95,27 @@ router.post('/login', [
     // Check if user exists
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+      return res.status(400).json({ 
+        message: 'Invalid credentials. User not found.',
+        field: 'email'
+      });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+      return res.status(400).json({ 
+        message: 'Invalid credentials. Incorrect password.',
+        field: 'password'
+      });
     }
 
     // Create JWT payload
     const payload = {
       user: {
         id: user.id,
-        role: user.role
+        role: user.role,
+        email: user.email
       }
     };
 
@@ -118,8 +125,22 @@ router.post('/login', [
       process.env.JWT_SECRET,
       { expiresIn: '1h' },
       (err, token) => {
-        if (err) throw err;
-        res.json({ token });
+        if (err) {
+          console.error('Token generation error:', err);
+          return res.status(500).json({ 
+            message: 'Error generating authentication token',
+            error: err.message 
+          });
+        }
+        res.json({ 
+          token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+          }
+        });
       }
     );
   } catch (err) {

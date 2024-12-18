@@ -3,51 +3,86 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import Layout from '../components/Layout';
-import { FaUser, FaLock, FaEnvelope } from 'react-icons/fa';
+import { FaUser, FaLock, FaEnvelope, FaSpinner } from 'react-icons/fa';
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
-  const { login, register } = useAuth();
+  const { login, register, loading, error } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
 
+  const validateForm = () => {
+    const errors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      errors.email = 'Email is required';
+    } else if (!emailRegex.test(email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    // Password validation
+    if (!password) {
+      errors.password = 'Password is required';
+    } else if (password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+
+    // Registration-specific validations
+    if (!isLogin) {
+      // Username validation
+      if (!username) {
+        errors.username = 'Username is required';
+      } else if (username.length < 3) {
+        errors.username = 'Username must be at least 3 characters';
+      }
+
+      // Confirm password validation
+      if (!confirmPassword) {
+        errors.confirmPassword = 'Please confirm your password';
+      } else if (password !== confirmPassword) {
+        errors.confirmPassword = 'Passwords do not match';
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       if (isLogin) {
-        // Simulated login logic
-        if (email === 'user@example.com' && password === 'password') {
-          login({ 
-            email, 
-            username: 'John Doe', 
-            avatar: 'https://via.placeholder.com/150' 
-          });
-          navigate('/dashboard');
-        } else {
-          setError('Invalid email or password');
-        }
+        // Login
+        await login(email, password);
+        navigate('/dashboard');
       } else {
-        // Simulated registration logic
-        if (username && email && password) {
-          register({ 
-            email, 
-            username, 
-            avatar: 'https://via.placeholder.com/150' 
-          });
-          navigate('/dashboard');
-        } else {
-          setError('Please fill in all fields');
-        }
+        // Register
+        await register({
+          username,
+          email,
+          password,
+          firstName: '', // Optional fields
+          lastName: ''
+        });
+        navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message);
+      // Error handling is now managed by AuthContext
+      console.error('Authentication error:', err);
     }
   };
 
@@ -83,6 +118,16 @@ const LoginPage = () => {
       backgroundColor: 'transparent',
       color: '#fff',
     },
+    inputError: {
+      border: '1px solid #ff4136',
+    },
+    errorText: {
+      color: '#ff4136',
+      fontSize: '0.8rem',
+      textAlign: 'left',
+      marginTop: '-15px',
+      marginBottom: '10px',
+    },
     icon: {
       position: 'absolute',
       right: '15px',
@@ -99,6 +144,10 @@ const LoginPage = () => {
       borderRadius: '10px',
       cursor: 'pointer',
       transition: 'background-color 0.3s',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      opacity: loading ? 0.5 : 1,
     },
     toggleText: {
       marginTop: '20px',
@@ -109,9 +158,12 @@ const LoginPage = () => {
       textDecoration: 'none',
       marginLeft: '5px',
     },
-    error: {
+    globalError: {
       color: '#ff4136',
       marginBottom: '15px',
+      padding: '10px',
+      backgroundColor: 'rgba(255, 65, 54, 0.1)',
+      borderRadius: '5px',
     }
   };
 
@@ -121,7 +173,7 @@ const LoginPage = () => {
         <div style={styles.form}>
           <h2 style={styles.title}>{isLogin ? 'Login' : 'Register'}</h2>
           
-          {error && <p style={styles.error}>{error}</p>}
+          {error && <p style={styles.globalError}>{error}</p>}
           
           <form onSubmit={handleSubmit}>
             {!isLogin && (
@@ -131,9 +183,15 @@ const LoginPage = () => {
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  style={styles.input}
+                  style={{
+                    ...styles.input,
+                    ...(formErrors.username ? styles.inputError : {})
+                  }}
                 />
                 <FaUser style={styles.icon} />
+                {formErrors.username && (
+                  <p style={styles.errorText}>{formErrors.username}</p>
+                )}
               </div>
             )}
             
@@ -143,9 +201,15 @@ const LoginPage = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={styles.input}
+                style={{
+                  ...styles.input,
+                  ...(formErrors.email ? styles.inputError : {})
+                }}
               />
               <FaEnvelope style={styles.icon} />
+              {formErrors.email && (
+                <p style={styles.errorText}>{formErrors.email}</p>
+              )}
             </div>
             
             <div style={styles.inputContainer}>
@@ -154,13 +218,46 @@ const LoginPage = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={styles.input}
+                style={{
+                  ...styles.input,
+                  ...(formErrors.password ? styles.inputError : {})
+                }}
               />
               <FaLock style={styles.icon} />
+              {formErrors.password && (
+                <p style={styles.errorText}>{formErrors.password}</p>
+              )}
             </div>
             
-            <button type="submit" style={styles.button}>
-              {isLogin ? 'Login' : 'Register'}
+            {!isLogin && (
+              <div style={styles.inputContainer}>
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  style={{
+                    ...styles.input,
+                    ...(formErrors.confirmPassword ? styles.inputError : {})
+                  }}
+                />
+                <FaLock style={styles.icon} />
+                {formErrors.confirmPassword && (
+                  <p style={styles.errorText}>{formErrors.confirmPassword}</p>
+                )}
+              </div>
+            )}
+            
+            <button 
+              type="submit" 
+              style={styles.button}
+              disabled={loading}
+            >
+              {loading ? (
+                <FaSpinner style={{ animation: 'spin 1s linear infinite' }} />
+              ) : (
+                isLogin ? 'Login' : 'Register'
+              )}
             </button>
           </form>
           
@@ -168,7 +265,15 @@ const LoginPage = () => {
             {isLogin ? "Don't have an account?" : "Already have an account?"}
             <Link 
               to="#" 
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                // Reset form and errors when switching modes
+                setFormErrors({});
+                setEmail('');
+                setPassword('');
+                setUsername('');
+                setConfirmPassword('');
+              }}
               style={styles.link}
             >
               {isLogin ? 'Register' : 'Login'}

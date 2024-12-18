@@ -1,9 +1,10 @@
 {
   "name": "space-tech-store",
   "version": "1.0.0",
-  "homepage": "https://Kevin-ace.github.io/react-gh-pages",
+  "homepage": null,
   "private": true,
   "dependencies": {
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
@@ -23,15 +24,14 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "start": "node backend/server.js",
+    "start": "react-scripts start",
     "server": "nodemon backend/server.js",
+    "backend": "node backend/server.js",
     "client": "npm start --prefix src",
     "dev": "concurrently \"npm run server\" \"npm start\"",
-    "deploy": "gh-pages -d build",
-    "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start:full": "concurrently \"npm run backend\" \"npm start\""
   },
   "eslintConfig": {
     "extends": [
@@ -53,8 +53,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "concurrently": "^8.2.0",
-    "gh-pages": "^6.2.0",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.1.9"
   }
 }

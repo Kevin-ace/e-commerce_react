@@ -1,80 +1,159 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-import HomePage from "./pages/HomePage";
-import ProductDetailsPage from "./pages/ProductDetailsPage";
-import LoginPage from "./pages/LoginPage";
-import PublicProductsPage from "./pages/PublicProductsPage";
-import { CartProvider } from './contexts/CartContext';
-import { WishlistProvider } from './contexts/WishlistContext';
-import { ReviewProvider } from './contexts/ReviewContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { RecommendationProvider } from './contexts/RecommendationContext';
-import CartButton from './components/CartButton';
-import CartPage from './pages/CartPage';
-import WishlistPage from './pages/WishlistPage';
+import React, { Suspense, lazy } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  Link,
+} from "react-router-dom";
+// Context Providers
+import { CartProvider } from "./contexts/CartContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
+import { ReviewProvider } from "./contexts/ReviewContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { RecommendationProvider } from "./contexts/RecommendationContext";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  
+// Components
+import CartButton from "./components/CartButton";
+import ThemeToggle from "./components/ThemeToggle";
+import Loader from "./components/Loader"; // Create a simple loading component
+
+// Lazy load pages for performance
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const PublicProductsPage = lazy(() => import("./pages/PublicProductsPage"));
+const CartPage = lazy(() => import("./pages/CartPage"));
+const WishlistPage = lazy(() => import("./pages/WishlistPage"));
+
+
+// Protected Route Component with Enhanced Error Handling
+const ProtectedRoute = ({ children, requiredRoles = [] }) => {
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
+    return <Loader />;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
+  // Optional role-based access control
+  if (requiredRoles.length > 0 && !requiredRoles.includes(user?.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return children;
 };
+
+// Global Error Boundary (simplified version)
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+          }}
+        >
+          <h1>Something went wrong</h1>
+          <p>We're sorry, but an unexpected error occurred.</p>
+          <Link to="/" style={{ color: "#007bff", marginTop: "20px" }}>
+            Return to Home
+          </Link>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const ThemedApp = () => {
   const { theme } = useTheme();
 
   return (
-    <div style={{ 
-      backgroundColor: theme.background, 
-      color: theme.text,
-      minHeight: '100vh',
-      transition: 'background-color 0.3s ease, color 0.3s ease'
-    }}>
+    <div
+      style={{
+        backgroundColor: theme.background,
+        color: theme.text,
+        minHeight: "100vh",
+        transition: "background-color 0.3s ease, color 0.3s ease",
+      }}
+    >
       <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/explore" element={<PublicProductsPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/product/:id" 
-            element={
-              <ProtectedRoute>
-                <ProductDetailsPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/wishlist" 
-            element={
-              <ProtectedRoute>
-                <WishlistPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/cart" 
-            element={
-              <ProtectedRoute>
-                <CartPage />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/explore" element={<PublicProductsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/product/:id"
+                element={
+                  <ProtectedRoute>
+                    <ProductDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/wishlist"
+                element={
+                  <ProtectedRoute>
+                    <WishlistPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                  <ProtectedRoute>
+                    <CartPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Catch-all route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Global Components */}
         <CartButton />
+        <ThemeToggle />
       </Router>
     </div>
   );
@@ -83,17 +162,17 @@ const ThemedApp = () => {
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <ReviewProvider>
-            <ThemeProvider>
+      <ThemeProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <ReviewProvider>
               <RecommendationProvider>
                 <ThemedApp />
               </RecommendationProvider>
-            </ThemeProvider>
-          </ReviewProvider>
-        </WishlistProvider>
-      </CartProvider>
+            </ReviewProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

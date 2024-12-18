@@ -6,9 +6,12 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json()); // Important: Parses JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parses URL-encoded bodies
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow frontend to access
+  credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -29,7 +32,19 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const PORT = process.env.BACKEND_PORT || 5001;
+const HOST = process.env.HOST || 'localhost';
+
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Server running on ${HOST}:${PORT}`);
+});
+
+// Handle server startup errors
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. 
+      Please make sure no other server is running on this port or 
+      change the port in your .env file.`);
+    process.exit(1);
+  }
 });

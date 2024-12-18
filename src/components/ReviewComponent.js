@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaStar, FaTrash } from 'react-icons/fa';
+import { 
+  // eslint-disable-next-line no-unused-vars
+  FaStar, 
+  FaTrash 
+} from 'react-icons/fa';
 import { useReview } from '../contexts/ReviewContext';
 import { useAuth } from '../contexts/AuthContext';
 
