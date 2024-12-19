@@ -8,12 +8,14 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true
+  withCredentials: true,
+  timeout: 10000 // 10 seconds timeout
 });
 
 // Add a request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
+    console.log(`Attempting request to: ${config.url}`);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -21,15 +23,40 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request Interceptor Error:', error);
     return Promise.reject(error);
   }
 );
 
 // Add a response interceptor for global error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Successful API Response:', response.data);
+    return response;
+  },
   (error) => {
+    // Detailed error logging
+    console.error('API Error Details:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
+
     // Handle specific error scenarios
+    if (error.code === 'ECONNABORTED') {
+      console.error('Request timed out. Check server availability.');
+    }
+
+    if (error.code === 'ERR_NETWORK') {
+      console.error('Network Error: Unable to connect to the server. Please check:',
+        '1. Backend server is running',
+        '2. Correct API URL is configured',
+        '3. No firewall blocking the connection'
+      );
+    }
+
     if (error.response) {
       const { status, data } = error.response;
       switch (status) {
@@ -48,13 +75,10 @@ api.interceptors.response.use(
           console.error('Server Error:', data.message || 'Please try again later');
           break;
         default:
-          console.error('An error occurred:', data.message || error.message);
+          console.error('Unhandled Error:', data.message || error.message);
       }
-    } else if (error.request) {
-      console.error('No response received:', error.request);
-    } else {
-      console.error('Error setting up request:', error.message);
     }
+
     return Promise.reject(error);
   }
 );

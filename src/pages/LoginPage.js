@@ -11,6 +11,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [formErrors, setFormErrors] = useState({});
 
   const { login, register, loading, error } = useAuth();
@@ -50,6 +52,15 @@ const LoginPage = () => {
       } else if (password !== confirmPassword) {
         errors.confirmPassword = 'Passwords do not match';
       }
+
+      // Optional first and last name validations
+      if (firstName && firstName.length < 2) {
+        errors.firstName = 'First name must be at least 2 characters';
+      }
+
+      if (lastName && lastName.length < 2) {
+        errors.lastName = 'Last name must be at least 2 characters';
+      }
     }
 
     setFormErrors(errors);
@@ -68,17 +79,17 @@ const LoginPage = () => {
       if (isLogin) {
         // Login
         await login(email, password);
-        navigate('/dashboard');
+        navigate('/'); // Navigate to home page with products
       } else {
         // Register
         await register({
           username,
           email,
           password,
-          firstName: '', // Optional fields
-          lastName: ''
+          firstName, 
+          lastName
         });
-        navigate('/dashboard');
+        navigate('/'); // Navigate to home page with products
       }
     } catch (err) {
       // Error handling is now managed by AuthContext
@@ -93,13 +104,15 @@ const LoginPage = () => {
       alignItems: 'center',
       height: '100vh',
       background: 'linear-gradient(135deg, #2b2d42, #8d99ae)',
+      padding: '20px',
     },
     form: {
       backgroundColor: '#16213e',
       padding: '40px',
       borderRadius: '15px',
       boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-      width: '400px',
+      width: '100%',
+      maxWidth: '450px',
       textAlign: 'center',
     },
     title: {
@@ -109,14 +122,16 @@ const LoginPage = () => {
     inputContainer: {
       position: 'relative',
       marginBottom: '20px',
+      width: '100%',
     },
     input: {
       width: '100%',
-      padding: '15px 50px 15px 20px',
-      borderRadius: '10px',
+      padding: '12px 15px',
+      borderRadius: '8px',
       border: '1px solid #00b3ff',
-      backgroundColor: 'transparent',
+      backgroundColor: 'rgba(255,255,255,0.1)',
       color: '#fff',
+      boxSizing: 'border-box',
     },
     inputError: {
       border: '1px solid #ff4136',
@@ -125,8 +140,8 @@ const LoginPage = () => {
       color: '#ff4136',
       fontSize: '0.8rem',
       textAlign: 'left',
-      marginTop: '-15px',
-      marginBottom: '10px',
+      marginTop: '5px',
+      marginBottom: '-15px',
     },
     icon: {
       position: 'absolute',
@@ -148,6 +163,7 @@ const LoginPage = () => {
       justifyContent: 'center',
       alignItems: 'center',
       opacity: loading ? 0.5 : 1,
+      marginTop: '20px',
     },
     toggleText: {
       marginTop: '20px',
@@ -164,6 +180,11 @@ const LoginPage = () => {
       padding: '10px',
       backgroundColor: 'rgba(255, 65, 54, 0.1)',
       borderRadius: '5px',
+    },
+    nameRow: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      gap: '10px',
     }
   };
 
@@ -177,22 +198,57 @@ const LoginPage = () => {
           
           <form onSubmit={handleSubmit}>
             {!isLogin && (
-              <div style={styles.inputContainer}>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  style={{
-                    ...styles.input,
-                    ...(formErrors.username ? styles.inputError : {})
-                  }}
-                />
-                <FaUser style={styles.icon} />
-                {formErrors.username && (
-                  <p style={styles.errorText}>{formErrors.username}</p>
-                )}
-              </div>
+              <>
+                <div style={styles.inputContainer}>
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{
+                      ...styles.input,
+                      ...(formErrors.username ? styles.inputError : {})
+                    }}
+                  />
+                  <FaUser style={styles.icon} />
+                  {formErrors.username && (
+                    <p style={styles.errorText}>{formErrors.username}</p>
+                  )}
+                </div>
+
+                <div style={styles.nameRow}>
+                  <div style={{...styles.inputContainer, flex: 1}}>
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      style={{
+                        ...styles.input,
+                        ...(formErrors.firstName ? styles.inputError : {})
+                      }}
+                    />
+                    {formErrors.firstName && (
+                      <p style={styles.errorText}>{formErrors.firstName}</p>
+                    )}
+                  </div>
+                  <div style={{...styles.inputContainer, flex: 1}}>
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      style={{
+                        ...styles.input,
+                        ...(formErrors.lastName ? styles.inputError : {})
+                      }}
+                    />
+                    {formErrors.lastName && (
+                      <p style={styles.errorText}>{formErrors.lastName}</p>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
             
             <div style={styles.inputContainer}>
@@ -273,6 +329,8 @@ const LoginPage = () => {
                 setPassword('');
                 setUsername('');
                 setConfirmPassword('');
+                setFirstName('');
+                setLastName('');
               }}
               style={styles.link}
             >

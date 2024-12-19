@@ -49,7 +49,17 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return userProfile.data;
     } catch (error) {
-      setError(error.response?.data?.message || 'Login failed');
+      console.error('Login Error Details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+
+      const errorMessage = error.response?.data?.message || 
+                            error.response?.data?.errors?.[0]?.msg || 
+                            'Login failed';
+      
+      setError(errorMessage);
       setIsAuthenticated(false);
       throw error;
     } finally {
@@ -72,7 +82,17 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return userProfile.data;
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed');
+      console.error('Registration Error Details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+
+      const errorMessage = error.response?.data?.message || 
+                            error.response?.data?.errors?.[0]?.msg || 
+                            'Registration failed';
+      
+      setError(errorMessage);
       setIsAuthenticated(false);
       throw error;
     } finally {

@@ -6,6 +6,7 @@ import {
   Navigate,
   Link,
 } from "react-router-dom";
+
 // Context Providers
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
@@ -17,7 +18,7 @@ import { RecommendationProvider } from "./contexts/RecommendationContext";
 // Components
 import CartButton from "./components/CartButton";
 import ThemeToggle from "./components/ThemeToggle";
-import Loader from "./components/Loader"; // Create a simple loading component
+import Loader from "./components/Loader";
 
 // Lazy load pages for performance
 const LandingPage = lazy(() => import("./pages/LandingPage"));
@@ -27,7 +28,9 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const PublicProductsPage = lazy(() => import("./pages/PublicProductsPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage"));
-
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const UnauthorizedPage = lazy(() => import("./pages/UnauthorizedPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 
 // Protected Route Component with Enhanced Error Handling
 const ProtectedRoute = ({ children, requiredRoles = [] }) => {
@@ -107,9 +110,12 @@ const ThemedApp = () => {
         <ErrorBoundary>
           <Suspense fallback={<Loader />}>
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/explore" element={<PublicProductsPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Protected Routes */}
               <Route
@@ -141,6 +147,14 @@ const ThemedApp = () => {
                 element={
                   <ProtectedRoute>
                     <CartPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />

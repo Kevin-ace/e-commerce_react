@@ -1,9 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/cart');
+const userRoutes = require('./routes/users');
 
 const app = express();
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
@@ -22,19 +27,22 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/products', require('./routes/products'));
-app.use('/api/cart', require('./routes/cart'));
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/users', userRoutes);
 
-// Error handling middleware
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).json({
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.stack
+  });
 });
 
-const PORT = process.env.BACKEND_PORT || 5001;
+// Start Server
 const HOST = process.env.HOST || 'localhost';
-
 const server = app.listen(PORT, HOST, () => {
   console.log(`Server running on ${HOST}:${PORT}`);
 });
